@@ -1,19 +1,18 @@
 import socket
 import sys
 import struct
-
-
-
+import random 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-server_socket.bind(("0.0.0.0", 19991))
+server_socket.bind(("0.0.0.0", 19990))
 
 
 def send(c,num):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     ss = struct.pack("!50si",c.encode(),num)
-    s.sendto(ss,("127.0.0.1",19990))
+    s.sendto(ss,("127.0.0.1",19991))
     s.close()
     print("Send:%s,%d" % (c,num))
+
 
 def recv():
     global server_socket
@@ -26,26 +25,24 @@ def recv():
 def make_ptk(ANonce, SNonce):
     return ANonce + SNonce
 
-
-num = 1
 while True:
-    ANonce, num = recv()
-    SNonce = '1'
-    send(SNonce, num + 1)
-    ptk = make_ptk(int(ANonce), int(SNonce))
-    check_ptk, num = recv()
-    if ptk == int(check_ptk):
-        use_ptk = ptk
-    a = str(ptk)
-    send(a , num + 1)
-
-    break
+	ANonce = '0'
+	num = 1
+	send(ANonce, num)
+	SNonce, num = recv()
+	ptk = make_ptk(int(ANonce), int(SNonce))
+	a = str(ptk)
+	send(a, num+1)
+	check_ptk, num = recv()
+	if  ptk == int(check_ptk):
+		use_ptk = ptk
+	break
+    # str,num = recv()
+    # num = num + 1
+    # str = chr(ord(str)+1)
+    # send(str,num)
     # if str == "d":
     #     break
-    # str = chr(ord(str)+1)
-    # num = num + 1
 
-print("Client done.")
+print("Server Done.")
 server_socket.close()
-
-
