@@ -1,7 +1,7 @@
 import socket
 import sys
 import struct
-
+import random
 
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -26,24 +26,42 @@ def recv():
 def make_ptk(ANonce, SNonce):
     return ANonce + SNonce
 
+def encrypt(ptk, msg):
+	#msg in asci
+	msg_ascii = ''.join(str(ord(c)) for c in msg)
+
+	#xor packet key and msg
+	encrypted_msg = ptk ^ int(msg_ascii)
+	print(encrypted_msg)
+	return encrypted_msg
 
 num = 1
 while True:
-    ANonce, num = recv()
-    SNonce = '1'
-    send(SNonce, num + 1)
-    ptk = make_ptk(int(ANonce), int(SNonce))
-    check_ptk, num = recv()
-    if ptk == int(check_ptk):
-        use_ptk = ptk
-    a = str(ptk)
-    send(a , num + 1)
+	#msg #1
+	ANonce, num = recv()
 
-    break
-    # if str == "d":
-    #     break
-    # str = chr(ord(str)+1)
-    # num = num + 1
+	SNonce = '111111111111111'
+	
+	# msg #2
+	send(SNonce, num + 1)
+
+	ptk = make_ptk(int(ANonce), int(SNonce))
+	#msg #3
+	check_ptk, num = recv()
+
+	
+	if ptk == int(check_ptk):
+		use_ptk = ptk
+	a = str(ptk)
+	
+	#msg #4
+	send(a , num + 1)
+
+	msg = encrypt(ptk, "Hello!")
+	#msg #4 again
+	send(str(msg) , num + 1)
+	break
+
 
 print("Client done.")
 server_socket.close()

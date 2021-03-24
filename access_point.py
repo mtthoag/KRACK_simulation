@@ -25,24 +25,40 @@ def recv():
 def make_ptk(ANonce, SNonce):
     return ANonce + SNonce
 
+def decrypt(ptk, msg):
+	#msg in asci
+
+	
+	#xor packet key and msg
+	decrypted_msg = ptk ^ int(msg)
+	print(decrypted_msg)
+	return decrypted_msg
+num = 1
 while True:
-	ANonce = '0'
-	num = 1
+	ANonce = '000000000000000'
+	
+	#msg #1
 	send(ANonce, num)
+	
+	#msg #2
 	SNonce, num = recv()
+	
 	ptk = make_ptk(int(ANonce), int(SNonce))
 	a = str(ptk)
+
+	#msg #3
 	send(a, num+1)
+	
+	#msg #4
 	check_ptk, num = recv()
 	if  ptk == int(check_ptk):
 		use_ptk = ptk
+
+	#msg #4 again
+	msg, num = recv()
+	decrypt(ptk, int(msg))
 	break
-    # str,num = recv()
-    # num = num + 1
-    # str = chr(ord(str)+1)
-    # send(str,num)
-    # if str == "d":
-    #     break
+
 
 print("Server Done.")
 server_socket.close()
