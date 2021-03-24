@@ -9,7 +9,7 @@ server_socket.bind(("0.0.0.0", 19990))
 def send(c,num):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     ss = struct.pack("!50si",c.encode(),num)
-    s.sendto(ss,("127.0.0.1",19991))
+    s.sendto(ss,("127.0.0.1",19992))
     s.close()
     print("Send:%s,%d" % (c,num))
 
@@ -25,14 +25,18 @@ def recv():
 def make_ptk(ANonce, SNonce):
     return ANonce + SNonce
 
-def decrypt(ptk, msg):
+def decrypt(ptk, e_msg):
 	#msg in asci
 
 	
 	#xor packet key and msg
-	decrypted_msg = ptk ^ int(msg)
-	print(decrypted_msg)
-	return decrypted_msg
+	decrypted_msg = ptk ^ int(e_msg)
+	sd_msg = str(decrypted_msg)
+
+	msg = ''.join(chr(int(sd_msg[i:i+3])) for i in range(0,len(sd_msg), 3))
+
+	print(msg)
+	return msg
 num = 1
 while True:
 	ANonce = '000000000000000'
@@ -51,10 +55,9 @@ while True:
 	
 	#msg #4
 	check_ptk, num = recv()
-	if  ptk == int(check_ptk):
-		use_ptk = ptk
+	ptk = int(check_ptk)
 
-	#msg #4 again
+	#recieve data
 	msg, num = recv()
 	decrypt(ptk, int(msg))
 	break

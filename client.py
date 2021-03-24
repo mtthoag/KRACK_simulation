@@ -11,7 +11,7 @@ server_socket.bind(("0.0.0.0", 19991))
 def send(c,num):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     ss = struct.pack("!50si",c.encode(),num)
-    s.sendto(ss,("127.0.0.1",19990))
+    s.sendto(ss,("127.0.0.1",19992))
     s.close()
     print("Send:%s,%d" % (c,num))
 
@@ -57,9 +57,16 @@ while True:
 	#msg #4
 	send(a , num + 1)
 
-	msg = encrypt(ptk, "Hello!")
-	#msg #4 again
-	send(str(msg) , num + 1)
+	#if msg3 is retransmitted reset the ptk to zero
+	check_ptk, num = recv()
+	if num == 3:
+		ptk = 0
+		send(str(ptk), 4)
+
+
+	msg = encrypt(ptk, "hello")
+	#send data to AP
+	send(str(msg) , 5)
 	break
 
 
