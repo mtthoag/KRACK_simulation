@@ -35,10 +35,10 @@ def decrypt(ptk, msg):
 
 	
 	#xor packet key and msg
-	decrypted_msg = ptk ^ int(msg)
-	sd_msg = str(decrypted_msg)
+	decrypted_msg = ptk ^ int(e_msg)
+	sd_msg = hex(decrypted_msg)[2:]
 
-	msg = ''.join(chr(int(sd_msg[i:i+3])) for i in range(0,len(sd_msg), 3))
+	msg = bytes.fromhex(sd_msg).decode('utf-8')
 	if msg == 'hello':
 		print("haha we decrypted the msg ", msg)
 	else:
