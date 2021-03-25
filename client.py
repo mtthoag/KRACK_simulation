@@ -13,14 +13,14 @@ def send(c,num):
     ss = struct.pack("!50si",c.encode(),num)
     s.sendto(ss,("127.0.0.1",19992))
     s.close()
-    print("Send:%s,%d" % (c,num))
+    print("Send:%s, msg%d\n" % (c,num))
 
 def recv():
     global server_socket
     data, addr = server_socket.recvfrom(1024)
     s,num = struct.unpack("!50si",data)
     s = s.decode("utf-8").replace("\0","")
-    print("Receive:%s,num:%d" % (s,num))
+    print("Receive:%s, msg%d\n" % (s,num))
     return s,num
 
 def make_ptk(ANonce, SNonce):
@@ -32,21 +32,25 @@ def encrypt(ptk, msg):
 	
 	#xor packet key and msg
 	encrypted_msg = ptk ^ int(msg_hex, 16)
-	print(encrypted_msg)
+	print("plaintext: ",msg," encrypted_msg: ", encrypted_msg)
 	return encrypted_msg
 
 num = 1
 while True:
 	#msg #1
+	print("Receiving ANonce from AP")
 	ANonce, num = recv()
 
-	SNonce = '111111111111'
+	SNonce = str(random.randint(100000000000,500000000000))
 	
 	# msg #2
+	print("Sending Snonce to AP")
 	send(SNonce, num + 1)
 
 	ptk = make_ptk(int(ANonce), int(SNonce))
+	
 	#msg #3
+	print("Receiving ptk from AP")
 	check_ptk, num = recv()
 
 	
@@ -55,12 +59,14 @@ while True:
 	a = str(ptk)
 	
 	#msg #4
+	print("Sending ptk to AP")
 	send(a , num + 1)
 
 	#if msg3 is retransmitted reset the ptk to zero
 	check_ptk, num = recv()
 	if num == 3:
 		ptk = 0
+		print("Received retransmittion of msg3, downloading ptk:%d " % ptk)
 		send(str(ptk), 4)
 
 

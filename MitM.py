@@ -10,13 +10,13 @@ def send_client(p, num):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(p,("127.0.0.1",19991))
     s.close()
-    print("Send: %d to client" % (num))
+    print("Send: msg%d to client\n" % (num))
 
 def send_ap(p, num):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.sendto(p,("127.0.0.1",19990))
     s.close()
-    print("Send:%d to AP" % (num))
+    print("Send: msg%d to AP\n" % (num))
 
 
 def recv():
@@ -24,13 +24,13 @@ def recv():
     data, addr = server_socket.recvfrom(1024)
     s,num = struct.unpack("!50si",data)
  
-    print("Receive num:%d" % (num))
+    print("Receive msg%d" % (num))
     return data,num
 
 def make_ptk(ANonce, SNonce):
     return ANonce + SNonce
 
-def decrypt(ptk, msg):
+def decrypt(ptk, e_msg):
 	#msg in asci
 
 	
@@ -40,9 +40,9 @@ def decrypt(ptk, msg):
 
 	msg = bytes.fromhex(sd_msg).decode('utf-8')
 	if msg == 'hello':
-		print("haha we decrypted the msg ", msg)
+		print("haha msg5 was decrypted  msg5:%s\n" % msg)
 	else:
-		print('You have defeated KRACK')
+		print('You have defeated KRACK\n')
 	return decrypted_msg
 
 
@@ -65,15 +65,14 @@ while True:
 		if blocked_four:
 			send_ap(p, num)
 		else:
+			print("Blocking msg4")
 			send_client(msg3, 3)
 			blocked_four = 1
 
 
 	#send the encrypted data from the client to the AP
 	elif num == 5:
-		print(1111)
 		send_ap(p, num)
-		print(33333)
 		s,num = struct.unpack("!50si",p)
 		s = s.decode("utf-8").replace("\0","")
 		decrypt(0, s)

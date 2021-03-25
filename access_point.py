@@ -11,7 +11,7 @@ def send(c,num):
     ss = struct.pack("!50si",c.encode(),num)
     s.sendto(ss,("127.0.0.1",19992))
     s.close()
-    print("Send:%s,%d" % (c,num))
+    print("Send:%s, msg%d\n" % (c,num))
 
 
 def recv():
@@ -19,7 +19,7 @@ def recv():
     data, addr = server_socket.recvfrom(1024)
     s,num = struct.unpack("!50si",data)
     s = s.decode("utf-8").replace("\0","")
-    print("Receive:%s,num:%d" % (s,num))
+    print("Receive:%s, msg%d\n" % (s,num))
     return s,num
 
 def make_ptk(ANonce, SNonce):
@@ -34,30 +34,37 @@ def decrypt(ptk, e_msg):
 	sd_msg = hex(decrypted_msg)[2:]
 
 	msg = bytes.fromhex(sd_msg).decode('utf-8')
-
-	print(msg)
+	print("Decrypted msg ", msg, '\n')
 	return msg
+
+
 num = 1
 while True:
-	ANonce = '000000000000000'
+	ANonce = str(random.randint(100000000000,500000000000))
 	
 	#msg #1
+	print('Sending the ANonce to supplicant ')
 	send(ANonce, num)
 	
 	#msg #2
+
+	print('Received SNonce from supplicant')
 	SNonce, num = recv()
 	
 	ptk = make_ptk(int(ANonce), int(SNonce))
 	a = str(ptk)
 
 	#msg #3
+	print("Sending ptk to supplicant ")
 	send(a, num+1)
 	
 	#msg #4
+	print("Receiving ptk from supplicant")
 	check_ptk, num = recv()
 	ptk = int(check_ptk)
 
 	#recieve data
+	print("Receiving data from supplicant")
 	msg, num = recv()
 	decrypt(ptk, int(msg))
 	break
