@@ -27,11 +27,11 @@ def make_ptk(ANonce, SNonce):
     return ANonce + SNonce
 
 def encrypt(ptk, msg):
-	#msg in asci
-	msg_ascii = ''.join(str(ord(c)) for c in msg)
-
+	#transform msg to hex
+	msg_hex = msg.encode('utf-8').hex()
+	
 	#xor packet key and msg
-	encrypted_msg = ptk ^ int(msg_ascii)
+	encrypted_msg = ptk ^ int(msg_hex, 16)
 	print(encrypted_msg)
 	return encrypted_msg
 
@@ -40,7 +40,7 @@ while True:
 	#msg #1
 	ANonce, num = recv()
 
-	SNonce = '111111111111111'
+	SNonce = '111111111111'
 	
 	# msg #2
 	send(SNonce, num + 1)
