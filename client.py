@@ -36,6 +36,10 @@ def encrypt(ptk, msg):
 	return encrypted_msg
 
 num = 1
+
+# In this DEMO version of the 4-way handshake the client sets an all-zero encyption key
+# TODO: Fix the client so that instead of using an all zero encryption key, they use the key
+# sent by the access point
 while True:
 	#msg #1
 	print("Receiving ANonce from AP")
@@ -61,6 +65,9 @@ while True:
 	#msg #4
 	print("Sending ptk to AP")
 	send(a , num + 1)
+
+
+
 
 	#if msg3 is retransmitted reset the ptk to zero
 	check_ptk, num = recv()
